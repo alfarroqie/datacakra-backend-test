@@ -1,8 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductController } from './controller/product/product.controller';
+import { ProductRepository } from './infrastructure/repositories/product.repository';
+import { Product } from './domain/entities/product.entity';
+import { Category } from './domain/entities/category.entity';
+import { AuditLog } from './domain/entities/audit-log.entity';
+import { ProductsUseCase } from './usecase/product.usecase';
+import { CategoriesController } from './controller/category/category.controller';
+import { CategoryRepository } from './infrastructure/repositories/category.repository';
+import { CategoryUseCase } from './usecase/category.usecase';
+import { AuditLogRepository } from './infrastructure/repositories/audit-log.repository';
 
 @Module({
   imports: [
@@ -18,13 +26,20 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [],
+        entities: [Product, Category, AuditLog],
         synchronize: false, // Use migrations instead of auto-sync
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([Product, Category, AuditLog]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [ProductController, CategoriesController],
+  providers: [
+    ProductRepository,
+    ProductsUseCase,
+    CategoryRepository,
+    CategoryUseCase,
+    AuditLogRepository,
+  ],
 })
 export class AppModule {}

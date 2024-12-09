@@ -8,6 +8,7 @@ services:
       - .env.example
     depends_on:
       - db
+    command: ["sh", "-c", "npm run typeorm:run-migrations && npm run start:dev"]
 
   db:
     image: postgres:13
